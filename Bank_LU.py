@@ -3,7 +3,7 @@ import pyodbc
 from PIL import Image
 from decimal import Decimal
 
-conn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; Server=LIPWNOTEBOOK\\SQLEXPRESS;Database=Banco_NuLipw;Trusted_Connection=yes;TrustServerCertificate=yes;')
+conn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; Server=LIPWNOTEBOOK\\SQLEXPRESS;Database=DB_bank;Trusted_Connection=yes;TrustServerCertificate=yes;')
 print("Conexão bem sucedida")
 cursor = conn.cursor()
 
