@@ -17,7 +17,7 @@ python --version
 3. Instale os requirements.txt executando o seguinte comando no terminal:
 
 ```bash
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Executando o Programa:
