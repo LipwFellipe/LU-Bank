@@ -7,7 +7,7 @@ O intuito do projeto foi melhorar meus conhecimentos em cima do SQL SERVER e faz
 
 1. Tenha o SSMS(SQL SERVER MANAGEMENT STUDIO) instalado na maquina e restaure o backup do arquivo DB_bank.bak :
 
-https://github.com/user-attachments/assets/75d03dae-f4e3-475a-af9b-29fad37a98dd
+https://github.com/user-attachments/assets/0a2b4fc7-27d4-44b2-b31d-03631bba02c9
 
 2. Certifique-se de ter o Python instalado na versão 3.9 ou acima. Verifique digitando no terminal:
 
