@@ -3,24 +3,9 @@ import pyodbc
 from PIL import Image
 from decimal import Decimal
 
-conn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; Server=LIPWNOTEBOOK\\SQLEXPRESS;Database=DB_bank;Trusted_Connection=yes;TrustServerCertificate=yes;')
+conn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server}; Server=LIPWNOTEBOOK\\SQLEXPRESS;Database=DB_Bank;Trusted_Connection=yes;TrustServerCertificate=yes;')
 print("Conexão bem sucedida")
 cursor = conn.cursor()
-
-def configurar_label(erro, widget, label, mensagem, cor_texto, cor_borda):
-    label.configure(text=mensagem, text_color=cor_texto)
-    widget.configure(border_color=cor_borda, placeholder_text=mensagem if erro else "", text_color=cor_texto)
-
-def validar_cpf(cpf):
-    return len(cpf) == 11 and cpf.isdigit()
-
-def inserir_usuario(Inome, Isenha, Icpf):
-    criar = f"""INSERT INTO usuario(nome, senha, cpf) VALUES('{Inome}', '{Isenha}', '{Icpf}')"""
-    cursor.execute(criar)
-    cursor.commit()
-    id = cursor.execute(f"SELECT id FROM usuario WHERE cpf = '{Icpf}'").fetchone()
-    cursor.execute(f"""INSERT INTO banco VALUES(0.00, '{id[0]}')""")
-    cursor.commit()
 
 def INSERT(cad_nome, cadas_cpf, cad_senha, cad_senha1, silvia_label):
     try:
@@ -28,42 +13,60 @@ def INSERT(cad_nome, cadas_cpf, cad_senha, cad_senha1, silvia_label):
         Icpf = cadas_cpf.get()
         Isenha = cad_senha.get()
         Isenha1 = cad_senha1.get()
-
-        NomeCpf = cursor.execute("SELECT nome, cpf FROM usuario").fetchall()
+        NomeCpf = cursor.execute("SELECT nome, cpf from usuario").fetchall()
         nomes, cpfs = zip(*NomeCpf)
 
         if Inome in nomes:
-            configurar_label(True, cad_nome, silvia_label, "Nome já cadastrado!", "#fc1406", "#fc1406")
-        else:
-            configurar_label(False, cad_nome, silvia_label, "", "#000000", "#000000")
-
-        if Isenha != Isenha1:
-            configurar_label(True, cad_senha, silvia_label, "Senhas não coincidem!", "#fc1406", "#fc1406")
-            configurar_label(True, cad_senha1, silvia_label, "", "#fc1406", "#fc1406")
-        else:
-            configurar_label(False, cad_senha, silvia_label, "", "#000000", "#000000")
-            configurar_label(False, cad_senha1, silvia_label, "", "#000000", "#000000")
+            silvia_label.configure(text="Nome já cadastrado!", text_color="#fc1406", font=("Helvetica", 15))
+            cad_nome.configure(border_color="#fc1406", placeholder_text="Nome já cadastrado!", text_color="#fc1406", placeholder_text_color="#fc1406")
+            cad_nome.delete(0, "end") 
+        elif Inome == "":
+            silvia_label.configure(text="Insira seu nome no campo abaixo", text_color="#fc1406", font=("Helvetica", 15))
+            cad_nome.configure(border_color="#fc1406", placeholder_text="Nome invalido...", text_color="#fc1406", placeholder_text_color="#fc1406")
+        elif Inome not in NomeCpf:
+            cad_nome.configure(border_color="#000000", text_color="#000000")
 
         if Icpf in cpfs:
-            configurar_label(True, cadas_cpf, silvia_label, "CPF já cadastrado!", "#fc1406", "#fc1406")
-        elif not validar_cpf(Icpf):
-            configurar_label(True, cadas_cpf, silvia_label, "CPF inválido!", "#fc1406", "#fc1406")
+            silvia_label.configure(text="CPF já cadastrado!", text_color="#fc1406", font=("Helvetica", 15))
+            cadas_cpf.configure(border_color="#fc1406", placeholder_text="CPF já cadastrado!", text_color="#fc1406", placeholder_text_color="#fc1406")
+            cadas_cpf.delete(0, "end")
+        elif len(Icpf) != 11 or not Icpf.isdigit():
+            silvia_label.configure(text="CPF deve conter 11 digitos e apenas numeros...", text_color="#fc1406", font=("Helvetica", 15))
+            cadas_cpf.configure(border_color="#fc1406", placeholder_text="CPF invalido...", text_color="#fc1406", placeholder_text_color="#fc1406")
+        elif len(Icpf) == 11 and Icpf not in cpfs and Icpf.isdigit():
+            cadas_cpf.configure(border_color="#000000", text_color="#000000")
         else:
-            configurar_label(False, cadas_cpf, silvia_label, "", "#000000", "#000000")
+            print('Noia')
 
-        if all([Isenha == Isenha1, Inome, validar_cpf(Icpf), Icpf not in cpfs, Inome not in nomes]):
-            inserir_usuario(Inome, Isenha, Icpf)
-            configurar_label(False, cad_nome, silvia_label, "Usuário criado com sucesso!", "#117f09", "#117f09")
-            configurar_label(False, cad_senha, silvia_label, "", "#117f09", "#117f09")
-            configurar_label(False, cad_senha1, silvia_label, "", "#117f09", "#117f09")
-            configurar_label(False, cadas_cpf, silvia_label, "", "#117f09", "#117f09")
+        if Isenha1 != Isenha:
+            silvia_label.configure(text="Suas senhas não coincidem!", text_color="#fc1406")
+            cad_senha.configure(border_color="#fc1406", placeholder_text="Senha invalida...", text_color="#fc1406", placeholder_text_color="#fc1406")
+            cad_senha1.configure(border_color="#fc1406", placeholder_text="Senha invalida...", text_color="#fc1406", placeholder_text_color="#fc1406")
+        elif Isenha == Isenha1:
+            cad_senha.configure(border_color="#000000", text_color="#000000")
+            cad_senha1.configure(border_color="#000000",text_color="#000000")
 
+        if Isenha == Isenha1 and Isenha != '' and Inome != '' and Inome not in nomes and len(Icpf) == 11 and Icpf.isdigit() and Icpf not in cpfs:
+            criar = f"""INSERT INTO usuario(nome, senha, cpf) VALUES('{Inome}', '{Isenha}', '{Icpf}')"""
+            cursor.execute(criar)
+            cursor.commit()
+            id = cursor.execute(f"SELECT id FROM usuario WHERE cpf = '{Icpf}'").fetchone()
+            cursor.execute(f"""INSERT INTO banco VALUES(0.00, '{id[0]}')""")
+            cursor.commit()
+             
+            silvia_label.configure(text="Usuario criado com sucesso!", text_color="#117f09")
+            cad_nome.configure(border_color="#117f09", text_color="#117f09")
+            cad_senha.configure(border_color="#117f09", text_color="#117f09")
+            cad_senha1.configure(border_color="#117f09", text_color="#117f09")
+            cadas_cpf.configure(border_color="#117f09", text_color="#117f09")
+        
     except Exception as e:
-        print(f"Erro: {e}")
-        configurar_label(True, cad_nome, silvia_label, "Erro no cadastro", "#fc1406", "#fc1406")
-        configurar_label(True, cad_senha, silvia_label, "ERRO", "#fc1406", "#fc1406")
-        configurar_label(True, cad_senha1, silvia_label, "ERRO", "#fc1406", "#fc1406")
-        configurar_label(True, cadas_cpf, silvia_label, "ERRO", "#fc1406", "#fc1406")
+        print(e)
+        silvia_label.configure(text="Oque vc fez?", text_color="#fc1406")
+        cad_nome.configure(border_color="#fc1406", placeholder_text="ERRO", text_color="#fc1406", placeholder_text_color="#fc1406")
+        cad_senha.configure(border_color="#fc1406", placeholder_text="ERRO", text_color="#fc1406", placeholder_text_color="#fc1406")
+        cad_senha1.configure(border_color="#fc1406", placeholder_text="ERRO", text_color="#fc1406", placeholder_text_color="#fc1406")
+        cadas_cpf.configure(border_color="#fc1406", placeholder_text="ERRO", text_color="#fc1406", placeholder_text_color="#fc1406")
 
 def cadastro():
     # Remove os widgets da primeira página
